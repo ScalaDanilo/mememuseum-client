@@ -1,1 +1,17 @@
 @import "tailwindcss";
+
+/* --- FIX AUTOCOMPLETAMENTO BROWSER (DARK MODE) --- */
+/* Sovrascrive lo sfondo bianco/giallo forzato dai browser durante l'autofill */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active {
+    /* Usiamo un'ombra interna per coprire lo sfondo con il colore zinc-950 */
+    -webkit-box-shadow: 0 0 0 50px #09090b inset !important;
+    
+    /* Forza il testo dell'autofill a rimanere bianco */
+    -webkit-text-fill-color: white !important;
+    
+    /* Un trucchetto extra per ritardare la transizione del colore originale all'infinito */
+    transition: background-color 5000s ease-in-out 0s;
+}

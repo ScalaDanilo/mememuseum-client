@@ -1,78 +1,64 @@
 import React from 'react';
 import { createBrowserRouter, RouterProvider, Outlet, Link } from 'react-router-dom';
 
-// --- 1. PAGINE FINTI (PLACEHOLDER) ---
-// Per ora sono solo dei div con un titolo, ci scriverai il codice in futuro
-const Home = () => <div className="p-8"><h1 className="text-3xl font-bold text-slate-800">🏠 Galleria Meme</h1><p className="mt-2 text-slate-600">Qui apparirà la griglia con i meme.</p></div>;
-const Login = () => <div className="p-8"><h1 className="text-3xl font-bold text-slate-800">🔑 Login / Registrazione</h1><p className="mt-2 text-slate-600">Qui ci sarà il form per accedere.</p></div>;
-const Upload = () => <div className="p-8"><h1 className="text-3xl font-bold text-slate-800">⬆️ Carica Meme</h1><p className="mt-2 text-slate-600">Qui ci sarà il form con Multer per l'upload.</p></div>;
-const MemeDetail = () => <div className="p-8"><h1 className="text-3xl font-bold text-slate-800">🖼️ Dettaglio Meme</h1><p className="mt-2 text-slate-600">Qui vedrai l'immagine grande, i voti e i commenti.</p></div>;
+import Register from './pages/Register';
+import Login from './pages/Login';
 
-// --- 2. LAYOUT PRINCIPALE ---
-// Questo componente fa da "cornice" a tutte le pagine
+const Home = () => <div className="p-8 text-center"><h1 className="text-3xl font-bold text-white drop-shadow-[0_0_10px_rgba(168,85,247,0.5)]">🏠 Galleria Meme</h1></div>;
+const Upload = () => <div className="p-8 text-center"><h1 className="text-3xl font-bold text-white drop-shadow-[0_0_10px_rgba(168,85,247,0.5)]">⬆️ Carica Meme</h1></div>;
+const MemeDetail = () => <div className="p-8 text-center"><h1 className="text-3xl font-bold text-white drop-shadow-[0_0_10px_rgba(168,85,247,0.5)]">🖼️ Dettaglio</h1></div>;
+
 const MainLayout = () => {
   return (
-    <div className="min-h-screen flex flex-col bg-slate-100 font-sans">
+    // min-h-[100dvh] è ottimizzato per i browser mobile (Dynamic Viewport Height)
+    <div className="min-h-[100dvh] flex flex-col bg-zinc-950 font-sans text-white">
       
-      {/* NAVBAR (Fissa in alto) */}
-      <header className="bg-indigo-600 text-white shadow-md sticky top-0 z-50">
-        <nav className="container mx-auto px-6 py-4 flex justify-between items-center">
-          <Link to="/" className="text-2xl font-black tracking-widest">
-            MEME<span className="text-indigo-300">MUSEUM</span>
+      <header className="bg-zinc-950/80 backdrop-blur-md border-b border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.15)] sticky top-0 z-50">
+        {/* Modificata l'impostazione flex per andare a capo sui telefoni */}
+        <nav className="container mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+          
+          <Link to="/" className="text-2xl font-black tracking-widest text-white drop-shadow-[0_0_8px_rgba(168,85,247,0.6)] text-center">
+            MEME<span className="text-purple-500">MUSEUM</span>
           </Link>
-          <div className="flex gap-6 font-medium">
-            <Link to="/" className="hover:text-indigo-200 transition-colors">Esplora</Link>
-            <Link to="/upload" className="hover:text-indigo-200 transition-colors">Carica</Link>
-            <Link to="/login" className="px-4 py-1 bg-white text-indigo-600 rounded-full hover:bg-indigo-50 transition-colors">
-              Accedi
+          
+          {/* Aggiunto flex-wrap per adattare i bottoni */}
+          <div className="flex flex-wrap justify-center gap-4 sm:gap-6 font-medium items-center">
+            <Link to="/" className="text-gray-300 hover:text-purple-400 transition-all hover:drop-shadow-[0_0_8px_rgba(168,85,247,0.8)]">Esplora</Link>
+            <Link to="/upload" className="text-gray-300 hover:text-purple-400 transition-all hover:drop-shadow-[0_0_8px_rgba(168,85,247,0.8)]">Carica</Link>
+            
+            <Link to="/register" className="px-5 py-2 bg-purple-600 text-white rounded-full font-bold hover:bg-purple-500 transition-all shadow-[0_0_15px_rgba(147,51,234,0.4)] hover:shadow-[0_0_25px_rgba(147,51,234,0.7)] text-sm sm:text-base">
+              Accedi / Registrati
             </Link>
           </div>
         </nav>
       </header>
 
-      {/* CONTENUTO DINAMICO */}
-      {/* L'Outlet è il "buco" dove React Router inietterà la Home, il Login, ecc. */}
-      <main className="flex-grow container mx-auto w-full">
+      <main className="flex-grow container mx-auto w-full px-4">
         <Outlet />
       </main>
 
-      {/* FOOTER (Fisso in basso) */}
-      <footer className="bg-slate-900 text-slate-400 text-center py-6 mt-auto">
-        <p className="text-sm">© 2026 MemeMuseum. Progetto Tecnologie Web.</p>
+      <footer className="bg-zinc-900 border-t border-purple-500/20 text-gray-500 text-center py-6 mt-auto">
+        <p className="text-xs sm:text-sm px-4">© 2026 MemeMuseum. L'unica piattaforma per il tuo black-humor.</p>
       </footer>
 
     </div>
   );
 };
 
-// --- 3. CONFIGURAZIONE DELLE ROTTE ---
-// Qui diciamo a React quale componente mostrare per ogni URL
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <MainLayout />, // Usiamo la cornice come elemento base
+    element: <MainLayout />, 
     children: [
-      {
-        path: "/",            // Se l'URL è localhost:5173/
-        element: <Home />,    // Mostra la Home dentro l'Outlet
-      },
-      {
-        path: "/login",       // Se l'URL è localhost:5173/login
-        element: <Login />,   // Mostra il Login
-      },
-      {
-        path: "/upload",
-        element: <Upload />,
-      },
-      {
-        path: "/meme/:id",    // Rotta dinamica (es. /meme/123)
-        element: <MemeDetail />,
-      }
+      { path: "/", element: <Home /> },
+      { path: "/login", element: <Login /> },
+      { path: "/register", element: <Register /> },
+      { path: "/upload", element: <Upload /> },
+      { path: "/meme/:id", element: <MemeDetail /> }
     ],
   },
 ]);
 
-// --- 4. AVVIO DELL'APP ---
 function App() {
   return <RouterProvider router={router} />;
 }
