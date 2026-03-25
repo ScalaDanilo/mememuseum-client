@@ -67,30 +67,27 @@ const Upload = () => {
     setSelectedTags(selectedTags.filter(tag => tag.id !== tagIdToRemove));
   };
 
-  // --- SUBMIT: INVIO AL BACKEND ---
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!imageFile || !title) return alert("Inserisci titolo e immagine!");
 
     setIsLoading(true);
 
-    // Essendo un file (Multer), dobbiamo usare FormData, NON un JSON standard!
     const formData = new FormData();
     formData.append('title', title);
     if (description) formData.append('description', description);
-    formData.append('image', imageFile); // 'image' deve corrispondere a quello configurato in Multer nel backend
+    formData.append('image', imageFile);
     
-    // Il backend si aspetta un array di ID (tagIds)
     const tagIds = selectedTags.map(tag => tag.id);
     if (tagIds.length > 0) {
-      formData.append('tagIds', JSON.stringify(tagIds)); // Convertiamo in stringa, il backend farà .split(',')
+      formData.append('tagIds', JSON.stringify(tagIds));
     }
 
     try {
       await api.post('/memes', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
-      navigate('/'); // Rimanda alla home se il caricamento ha successo
+      navigate('/');
     } catch (error) {
       console.error("Errore caricamento:", error);
       alert(error.response?.data?.error || "Errore durante il caricamento del meme.");
@@ -113,7 +110,6 @@ const Upload = () => {
         
         <div className="flex flex-col md:flex-row gap-8 items-start">
           
-          {/* SINISTRA: Upload Immagine */}
           <div className="w-full md:w-1/2">
             <label 
               className={`
@@ -145,7 +141,6 @@ const Upload = () => {
             </label>
           </div>
 
-          {/* DESTRA: Testi e Tag */}
           <div className="w-full md:w-1/2 flex flex-col gap-6">
             
             <div className="relative" ref={dropdownRef}>
@@ -169,7 +164,6 @@ const Upload = () => {
                 </button>
               </div>
 
-              {/* Tendina Dropdown */}
               {isDropdownOpen && (
                 <div className="absolute z-20 w-full mt-2 bg-zinc-800 border border-purple-500/50 rounded-lg shadow-[0_10px_30px_rgba(0,0,0,0.5)] overflow-hidden">
                   <div className="flex flex-wrap gap-2 p-3 max-h-32 overflow-y-auto scrollbar-thin scrollbar-thumb-purple-600 scrollbar-track-zinc-900">
@@ -181,7 +175,7 @@ const Upload = () => {
                           onClick={() => handleAddTag(tag)}
                           className="px-3 py-1.5 bg-zinc-950 border border-purple-500/30 text-gray-300 rounded-md text-sm hover:bg-purple-600 hover:text-white transition-all font-medium"
                         >
-                          #{tag.name} {/* Aggiunto il cancelletto qui */}
+                          #{tag.name}
                         </button>
                       ))
                     ) : (
@@ -193,12 +187,11 @@ const Upload = () => {
                 </div>
               )}
 
-              {/* Tag Selezionati (pillole) */}
               {selectedTags.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-3">
                   {selectedTags.map(tag => (
                     <span key={tag.id} className="flex items-center gap-1 px-3 py-1 bg-purple-600/20 text-purple-300 border border-purple-500/50 rounded-full text-sm font-bold shadow-[0_0_8px_rgba(168,85,247,0.2)]">
-                      #{tag.name} {/* Aggiunto il cancelletto qui */}
+                      #{tag.name}
                       <button type="button" onClick={() => handleRemoveTag(tag.id)} className="hover:text-white transition-colors ml-1">
                         <X size={14} />
                       </button>

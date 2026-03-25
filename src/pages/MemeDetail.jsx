@@ -14,7 +14,6 @@ const MemeDetail = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // STATI PER I VOTI E MODAL
   const [likes, setLikes] = useState(0);
   const [userVote, setUserVote] = useState(0);
   const [isLikesModalOpen, setIsLikesModalOpen] = useState(false);
@@ -58,7 +57,7 @@ const MemeDetail = () => {
       try {
         const votesResponse = await api.get(`/votes/${id}`);
         setLikes(votesResponse.data.likesCount);
-        setLikedUsers(votesResponse.data.likedBy); // Salva la lista
+        setLikedUsers(votesResponse.data.likedBy);
         
         const username = getCurrentUsername();
         if (username && votesResponse.data.likedBy && votesResponse.data.dislikedBy) {
@@ -111,7 +110,7 @@ const MemeDetail = () => {
       
       const response = await api.get(`/votes/${id}`);
       setLikes(response.data.likesCount);
-      setLikedUsers(response.data.likedBy); // Aggiorna la lista
+      setLikedUsers(response.data.likedBy);
       
       const username = getCurrentUsername();
       if (response.data.likedBy.includes(username)) setUserVote(1);
@@ -148,11 +147,9 @@ const MemeDetail = () => {
               <img src={`${BACKEND_URL}${meme.imageUrl}`} alt={meme.title} className="w-full h-auto object-contain max-h-[70vh]" />
             </div>
             
-            {/* BARRA DEI VOTI COMPATTA E CENTRATA */}
             <div className="flex items-center justify-center bg-zinc-900/80 px-8 py-3 rounded-full border border-purple-500/30 shadow-[0_0_20px_rgba(168,85,247,0.1)] self-center w-max mt-2">
               <div className="flex gap-8 items-center">
                 
-                {/* GRUPPO LIKE: Cuore (Vota) e Numero (Apre Lista) SEPARATI */}
                 <div className="flex items-center gap-3">
                   <button 
                     onClick={() => handleVote(1)}
@@ -263,7 +260,6 @@ const MemeDetail = () => {
         </div>
       </div>
 
-      {/* --- MODAL DEI LIKE IN SOVRIMPRESSIONE --- */}
       {isLikesModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
           <div className="bg-zinc-900 border border-purple-500/30 rounded-2xl w-full max-w-sm shadow-[0_0_30px_rgba(168,85,247,0.2)] overflow-hidden flex flex-col max-h-[70vh]">

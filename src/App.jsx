@@ -17,10 +17,8 @@ const MainLayout = () => {
 
   const [token, setToken] = useState(localStorage.getItem('token'));
   
-  // --- NUOVO STATO: Salveremo qui l'URL dell'immagine ---
   const [userAvatar, setUserAvatar] = useState(null);
 
-  // 1. Controllo validità Token (quello che avevamo già)
   useEffect(() => {
     const checkToken = () => {
       const currentToken = localStorage.getItem('token');
@@ -48,24 +46,21 @@ const MainLayout = () => {
 
   const isAuthenticated = token && token !== 'undefined' && token !== 'null' && token !== '';
 
-  // --- 2. NUOVO EFFECT: Recupera l'avatar dell'utente ---
   useEffect(() => {
     const fetchAvatar = () => {
       if (isAuthenticated) {
-        // Se siamo loggati, chiediamo i dati al backend
         api.get('/users/profile')
            .then(response => {
-             setUserAvatar(response.data.imageUrl); // Salviamo l'url dell'immagine
+             setUserAvatar(response.data.imageUrl);
            })
            .catch(err => console.error("Errore recupero avatar per la Navbar", err));
       } else {
-        setUserAvatar(null); // Se facciamo logout, svuotiamo l'avatar
+        setUserAvatar(null);
       }
     };
 
-    fetchAvatar(); // Lo esegue subito
+    fetchAvatar();
 
-    // Ascoltiamo l'evento "profileUpdated" che lanceremo dal Profilo!
     window.addEventListener('profileUpdated', fetchAvatar);
     return () => window.removeEventListener('profileUpdated', fetchAvatar);
   }, [isAuthenticated]);
@@ -96,18 +91,14 @@ const MainLayout = () => {
         <nav className="container mx-auto px-4 py-4">
           <div className="flex flex-wrap items-center justify-between gap-y-4">
 
-            {/* 1. LOGO (Sinistra) */}
             <Link to="/" className="text-2xl font-black tracking-widest text-white drop-shadow-[0_0_8px_rgba(168,85,247,0.6)] order-1">
               MEME<span className="text-purple-500">MUSEUM</span>
             </Link>
 
-            {/* 2. MENU DI NAVIGAZIONE (Centro su PC, Riga sotto su Mobile) */}
-            {/* 'w-full lg:w-auto' è la magia che lo fa andare a capo su telefono ma non su PC */}
             <div className="flex flex-wrap justify-center gap-4 sm:gap-6 font-medium items-center w-full lg:w-auto order-3 lg:order-2">
               <Link to="/" className="text-gray-300 hover:text-purple-400 transition-all hover:drop-shadow-[0_0_8px_rgba(168,85,247,0.8)]">Esplora</Link>
               <Link to="/upload" className="text-gray-300 hover:text-purple-400 transition-all hover:drop-shadow-[0_0_8px_rgba(168,85,247,0.8)]">Carica</Link>
 
-              {/* TASTO FILTRA (Con la tua logica originale) */}
               <div className="relative">
                 <button
                   onClick={() => { setIsFilterOpen(!isFilterOpen); setShowTagInput(false); }}
@@ -147,8 +138,6 @@ const MainLayout = () => {
               </Link>
             </div>
 
-            {/* 3. PROFILO / ACCEDI (Fisso a Destra) */}
-            {/* 'order-2 lg:order-3 shrink-0' lo tiene incollato in alto a destra sul telefono */}
             <div className="order-2 lg:order-3 shrink-0">
               {isAuthenticated ? (
                 <Link to="/profile" className="flex items-center justify-center w-10 h-10 bg-zinc-900 rounded-full border border-purple-500 hover:bg-purple-900/20 transition-all shadow-[0_0_10px_rgba(168,85,247,0.3)] hover:shadow-[0_0_20px_rgba(168,85,247,0.6)] overflow-hidden">

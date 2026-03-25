@@ -22,7 +22,6 @@ const Profile = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        // CORREZIONE 1: L'URL esatto del tuo backend
         const response = await api.get('/users/profile'); 
         setUser(response.data);
         setMemes(response.data.memes || []);
@@ -78,7 +77,6 @@ const Profile = () => {
   const handleDeleteAccount = async () => {
     if (window.confirm("Sei SICURO di voler eliminare il tuo account e tutti i tuoi meme? L'azione è irreversibile.")) {
       try {
-        // CORREZIONE 3: L'URL esatto per il delete
         await api.delete('/users/delete-account');
         localStorage.removeItem('token');
         window.dispatchEvent(new Event('authChange'));

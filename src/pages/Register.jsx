@@ -43,7 +43,6 @@ const Register = () => {
 
       localStorage.setItem('token', response.data.token);
       
-      // SVEGLIAMO REACT!
       window.dispatchEvent(new Event('authChange'));
       
       navigate('/'); 

@@ -15,13 +15,11 @@ const Home = () => {
   const sortBy = searchParams.get('sortBy');
   const tagQuery = searchParams.get('tag');
 
-  // Funzione per ripulire i filtri dall'URL
   const clearFilters = () => {
     navigate('/'); 
     setCurrentPage(1); 
   };
 
-  // --- NUOVA FUNZIONE: Traduce il codice del filtro nel testo leggibile ---
   const getSortLabel = (value) => {
     switch (value) {
       case 'date_desc': return 'Più Recente';
@@ -76,12 +74,10 @@ const Home = () => {
   return (
     <div className="min-h-screen bg-zinc-950 px-4 py-8 sm:px-8">
       
-      {/* SEZIONE FILTRI ATTIVI CON TESTO CORRETTO */}
       {(sortBy || tagQuery) && (
         <div className="mb-8 flex justify-center">
           <div className="flex items-center gap-3 px-5 py-2.5 bg-purple-900/20 border border-purple-500/50 rounded-full text-purple-300 text-sm font-bold shadow-[0_0_15px_rgba(168,85,247,0.3)]">
             <span>
-              {/* Usiamo getSortLabel qui! */}
               Filtri: {sortBy ? getSortLabel(sortBy) : ''} {sortBy && tagQuery ? '| ' : ''}{tagQuery ? `Tag: #${tagQuery}` : ''}
             </span>
             <div className="h-4 w-[1px] bg-purple-500/50 mx-1"></div>

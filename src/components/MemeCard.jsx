@@ -6,12 +6,11 @@ import api, { BACKEND_URL } from '../api/axios';
 const MemeCard = ({ meme }) => {
   const navigate = useNavigate();
   const [likes, setLikes] = useState(0);
-  const [userVote, setUserVote] = useState(0); 
-  
-  // STATI PER LA MODAL DEI LIKE
+  const [userVote, setUserVote] = useState(0);
+
   const [isLikesModalOpen, setIsLikesModalOpen] = useState(false);
   const [likedUsers, setLikedUsers] = useState([]);
-  
+
   const getCurrentUsername = () => {
     const token = localStorage.getItem('token');
     if (!token) return null;
@@ -28,8 +27,8 @@ const MemeCard = ({ meme }) => {
       try {
         const response = await api.get(`/votes/${meme.id}`);
         setLikes(response.data.likesCount);
-        setLikedUsers(response.data.likedUsersData); // <-- Ora prendiamo i dati completi!
-        
+        setLikedUsers(response.data.likedUsersData);
+
         const username = getCurrentUsername();
         if (username) {
           if (response.data.likedBy.includes(username)) {
@@ -48,14 +47,14 @@ const MemeCard = ({ meme }) => {
   }, [meme.id]);
 
   const handleVote = async (value, e) => {
-    e.stopPropagation(); // Evita di aprire il meme quando voti
+    e.stopPropagation();
     try {
       await api.post(`/votes/${meme.id}`, { value: value });
-      
+
       const response = await api.get(`/votes/${meme.id}`);
       setLikes(response.data.likesCount);
-      setLikedUsers(response.data.likedBy); // Aggiorniamo la lista in tempo reale
-      
+      setLikedUsers(response.data.likedBy);
+
       const username = getCurrentUsername();
       if (response.data.likedBy.includes(username)) {
         setUserVote(1);
@@ -91,15 +90,15 @@ const MemeCard = ({ meme }) => {
   return (
     <>
       <div className="relative group break-inside-avoid overflow-hidden rounded-xl border border-purple-500/20 bg-zinc-900 hover:border-purple-500/60 transition-all hover:shadow-[0_0_20px_rgba(168,85,247,0.3)] flex flex-col">
-        
+
         <div className="relative cursor-pointer" onClick={handleCardClick}>
-          <img 
-            src={`${BACKEND_URL}${meme.imageUrl}`} 
-            alt={meme.title} 
+          <img
+            src={`${BACKEND_URL}${meme.imageUrl}`}
+            alt={meme.title}
             className="w-full h-auto object-cover"
             loading="lazy"
           />
-          
+
           <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-4 pt-16 pointer-events-none">
             {meme.tags && meme.tags.length > 0 && (
               <div className="flex flex-wrap gap-x-2 gap-y-1 mb-1.5 pointer-events-auto">
@@ -119,21 +118,19 @@ const MemeCard = ({ meme }) => {
 
         <div className="flex items-center justify-between px-4 py-3 bg-zinc-950 border-t border-purple-500/20">
           <div className="flex gap-4 sm:gap-6 items-center">
-            
-            {/* GRUPPO LIKE: Cuore (Vota) e Numero (Apre Lista) SEPARATI */}
+
             <div className="flex items-center gap-1.5">
-              <button 
+              <button
                 onClick={(e) => handleVote(1, e)}
-                className={`transition-all group/btn ${
-                  userVote === 1 
-                    ? 'text-green-400 drop-shadow-[0_0_8px_rgba(74,222,128,0.8)]' 
+                className={`transition-all group/btn ${userVote === 1
+                    ? 'text-green-400 drop-shadow-[0_0_8px_rgba(74,222,128,0.8)]'
                     : 'text-gray-400 hover:text-green-400 hover:drop-shadow-[0_0_8px_rgba(74,222,128,0.8)]'
-                }`}
+                  }`}
               >
                 <Heart size={20} className={`group-active/btn:scale-75 transition-transform ${userVote === 1 ? 'fill-current' : ''}`} />
               </button>
 
-              <button 
+              <button
                 onClick={openLikesModal}
                 className="font-bold text-sm text-gray-400 hover:text-white transition-colors"
               >
@@ -141,19 +138,18 @@ const MemeCard = ({ meme }) => {
               </button>
             </div>
 
-            <button 
+            <button
               onClick={(e) => handleVote(-1, e)}
-              className={`flex items-center gap-1.5 transition-all group/btn ${
-                userVote === -1 
-                  ? 'text-red-500 drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]' 
+              className={`flex items-center gap-1.5 transition-all group/btn ${userVote === -1
+                  ? 'text-red-500 drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]'
                   : 'text-gray-400 hover:text-red-500 hover:drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]'
-              }`}
+                }`}
             >
               <HeartCrack size={20} className={`group-active/btn:scale-75 transition-transform ${userVote === -1 ? 'fill-current' : ''}`} />
             </button>
           </div>
 
-          <button 
+          <button
             onClick={handleCommentClick}
             className="flex items-center gap-1.5 text-gray-400 hover:text-purple-400 hover:drop-shadow-[0_0_8px_rgba(168,85,247,0.8)] transition-all"
           >
@@ -163,14 +159,13 @@ const MemeCard = ({ meme }) => {
         </div>
       </div>
 
-      {/* --- MODAL DEI LIKE IN SOVRIMPRESSIONE --- */}
       {isLikesModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
           <div className="bg-zinc-900 border border-purple-500/30 rounded-2xl w-full max-w-sm shadow-[0_0_30px_rgba(168,85,247,0.2)] overflow-hidden flex flex-col max-h-[70vh]">
-            
+
             <div className="flex items-center justify-between p-4 border-b border-zinc-800">
               <h3 className="font-bold text-lg text-white">Piace a</h3>
-              <button 
+              <button
                 onClick={(e) => { e.stopPropagation(); setIsLikesModalOpen(false); }}
                 className="text-gray-400 hover:text-red-400 transition-colors"
               >
@@ -185,7 +180,6 @@ const MemeCard = ({ meme }) => {
                 likedUsers.map((user, index) => (
                   <div key={index} className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-zinc-800 border border-purple-500/30 overflow-hidden flex items-center justify-center shrink-0">
-                      {/* Controllo se l'utente ha la foto profilo */}
                       {user.imageUrl ? (
                         <img src={`${BACKEND_URL}${user.imageUrl}`} alt={user.username} className="w-full h-full object-cover" />
                       ) : (

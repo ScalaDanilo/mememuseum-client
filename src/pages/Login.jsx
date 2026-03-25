@@ -32,13 +32,10 @@ const Login = () => {
         password: formData.password
       });
 
-      // Salviamo il token
       localStorage.setItem('token', response.data.token);
       
-      // SVEGLIAMO REACT!
       window.dispatchEvent(new Event('authChange'));
       
-      // Reindirizziamo
       navigate('/'); 
 
     } catch (err) {
