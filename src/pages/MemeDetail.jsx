@@ -15,6 +15,7 @@ const MemeDetail = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [likes, setLikes] = useState(0);
+  const [dislikes, setDislikes] = useState(0); // 🌟 Nuovo stato per i downvote
   const [userVote, setUserVote] = useState(0);
   const [isLikesModalOpen, setIsLikesModalOpen] = useState(false);
   const [likedUsers, setLikedUsers] = useState([]);
@@ -36,9 +37,19 @@ const MemeDetail = () => {
     }
   };
 
+  const getCurrentUserId = () => {
+    const currentToken = localStorage.getItem('token');
+    if (!currentToken || currentToken === 'undefined' || currentToken === 'null') return null;
+    try {
+      const payload = JSON.parse(atob(currentToken.split('.')[1]));
+      return payload.userId;
+    } catch (e) {
+      return null;
+    }
+  };
+
   const isAuthenticated = !!getCurrentUsername();
 
-  // Funzione helper per scatenare l'alert personalizzato
   const triggerAlert = (message) => {
     setCustomAlert({ isOpen: true, message });
   };
@@ -65,6 +76,7 @@ const MemeDetail = () => {
       try {
         const votesResponse = await api.get(`/votes/${id}`);
         setLikes(votesResponse.data.likesCount);
+        setDislikes(votesResponse.data.dislikesCount || 0);
         setLikedUsers(votesResponse.data.likedBy);
 
         const username = getCurrentUsername();
@@ -118,6 +130,7 @@ const MemeDetail = () => {
 
       const response = await api.get(`/votes/${id}`);
       setLikes(response.data.likesCount);
+      setDislikes(response.data.dislikesCount || 0); // 🌟 Aggiorna i downvote dopo il voto
       setLikedUsers(response.data.likedBy);
 
       const username = getCurrentUsername();
@@ -135,13 +148,12 @@ const MemeDetail = () => {
   };
 
   const handleDeleteMeme = async () => {
-    // Un piccolo controllo di sicurezza nativo del browser prima di radere al suolo il meme
     if (!window.confirm("Sei sicuro di voler eliminare definitivamente questo meme capolavoro?")) return;
 
     try {
       await api.delete(`/memes/${id}`);
       triggerAlert("Meme eliminato con successo!");
-      setTimeout(() => navigate('/'), 1500); // Rimanda alla home dopo l'alert
+      setTimeout(() => navigate('/'), 1500);
     } catch (error) {
       triggerAlert(error.response?.data?.error || "Errore durante l'eliminazione del meme.");
     }
@@ -172,8 +184,11 @@ const MemeDetail = () => {
               />
             </div>
 
+            {/* BARRA DEI VOTI AGGIORNATA */}
             <div className="flex items-center justify-center bg-zinc-900/80 px-8 py-3 rounded-full border border-purple-500/30 shadow-[0_0_20px_rgba(168,85,247,0.1)] self-center w-max mt-2">
               <div className="flex gap-8 items-center">
+                
+                {/* UPVOTE */}
                 <div className="flex items-center gap-3">
                   <button
                     onClick={() => handleVote(1)}
@@ -190,12 +205,20 @@ const MemeDetail = () => {
                   </button>
                 </div>
 
-                <button
-                  onClick={() => handleVote(-1)}
-                  className={`flex items-center gap-2 transition-all group/btn ${userVote === -1 ? 'text-red-500 drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]' : 'text-gray-400 hover:text-red-500 hover:drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]'}`}
-                >
-                  <HeartCrack size={28} className={`group-active/btn:scale-75 transition-transform ${userVote === -1 ? 'fill-current' : ''}`} />
-                </button>
+                {/* DOWNVOTE (Simmetrico con contatore numerico non cliccabile) */}
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => handleVote(-1)}
+                    className={`flex items-center gap-2 transition-all group/btn ${userVote === -1 ? 'text-red-500 drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]' : 'text-gray-400 hover:text-red-500 hover:drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]'}`}
+                  >
+                    <HeartCrack size={28} className={`group-active/btn:scale-75 transition-transform ${userVote === -1 ? 'fill-current' : ''}`} />
+                  </button>
+                  
+                  <span className="font-black text-xl text-gray-400 select-none">
+                    {dislikes}
+                  </span>
+                </div>
+
               </div>
             </div>
           </div>
@@ -214,7 +237,7 @@ const MemeDetail = () => {
               </div>
 
               {/* Mostra il tasto rosso solo se l'utente loggato è il creatore del meme */}
-              {getCurrentUsername() === meme.user?.username && (
+              {getCurrentUserId() === meme.userId && (
                 <button
                   onClick={handleDeleteMeme}
                   className="flex items-center gap-2 bg-red-600/10 hover:bg-red-600 border border-red-500/30 hover:border-red-600 text-red-400 hover:text-white px-4 py-2 rounded-xl transition-all font-semibold text-sm shadow-[0_0_15px_rgba(239,68,68,0.05)] active:scale-95 cursor-pointer"
@@ -296,7 +319,7 @@ const MemeDetail = () => {
         </div>
       </div>
 
-      {/* MODALE DI CONTROLLO DEI LIKE (Invariata) */}
+      {/* MODALE DI CONTROLLO DEI LIKE */}
       {isLikesModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
           <div className="bg-zinc-900 border border-purple-500/30 rounded-2xl w-full max-w-sm shadow-[0_0_30px_rgba(168,85,247,0.2)] overflow-hidden flex flex-col max-h-[70vh]">
@@ -324,7 +347,7 @@ const MemeDetail = () => {
         </div>
       )}
 
-      {/* 🌟 MODALE ALERT PERSONALIZZATA (Sostituisce l'alert di default) */}
+      {/* MODALE ALERT PERSONALIZZATA */}
       {customAlert.isOpen && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-fade-in">
           <div className="bg-zinc-900 border border-purple-500/40 rounded-2xl w-full max-w-sm shadow-[0_0_40px_rgba(168,85,247,0.3)] overflow-hidden p-6 text-center">

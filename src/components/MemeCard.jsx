@@ -6,6 +6,7 @@ import api, { BACKEND_URL } from '../api/axios';
 const MemeCard = ({ meme }) => {
   const navigate = useNavigate();
   const [likes, setLikes] = useState(0);
+  const [dislikes, setDislikes] = useState(0);
   const [userVote, setUserVote] = useState(0);
 
   const [isLikesModalOpen, setIsLikesModalOpen] = useState(false);
@@ -27,6 +28,7 @@ const MemeCard = ({ meme }) => {
       try {
         const response = await api.get(`/votes/${meme.id}`);
         setLikes(response.data.likesCount);
+        setDislikes(response.data.dislikesCount || 0);
         setLikedUsers(response.data.likedUsersData);
 
         const username = getCurrentUsername();
@@ -53,7 +55,7 @@ const MemeCard = ({ meme }) => {
 
       const response = await api.get(`/votes/${meme.id}`);
       setLikes(response.data.likesCount);
-      setLikedUsers(response.data.likedBy);
+      setDislikes(response.data.dislikesCount || 0);
 
       const username = getCurrentUsername();
       if (response.data.likedBy.includes(username)) {
@@ -117,8 +119,9 @@ const MemeCard = ({ meme }) => {
         </div>
 
         <div className="flex items-center justify-between px-4 py-3 bg-zinc-950 border-t border-purple-500/20">
-          <div className="flex gap-4 sm:gap-6 items-center">
+          <div className="flex gap-4 sm:gap-5 items-center">
 
+            {/* Sezione Upvote (Cliccabile con modale) */}
             <div className="flex items-center gap-1.5">
               <button
                 onClick={(e) => handleVote(1, e)}
@@ -138,15 +141,23 @@ const MemeCard = ({ meme }) => {
               </button>
             </div>
 
-            <button
-              onClick={(e) => handleVote(-1, e)}
-              className={`flex items-center gap-1.5 transition-all group/btn ${userVote === -1
-                  ? 'text-red-500 drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]'
-                  : 'text-gray-400 hover:text-red-500 hover:drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]'
-                }`}
-            >
-              <HeartCrack size={20} className={`group-active/btn:scale-75 transition-transform ${userVote === -1 ? 'fill-current' : ''}`} />
-            </button>
+            {/* Sezione Downvote */}
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={(e) => handleVote(-1, e)}
+                className={`transition-all group/btn ${userVote === -1
+                    ? 'text-red-500 drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]'
+                    : 'text-gray-400 hover:text-red-500 hover:drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]'
+                  }`}
+              >
+                <HeartCrack size={20} className={`group-active/btn:scale-75 transition-transform ${userVote === -1 ? 'fill-current' : ''}`} />
+              </button>
+              
+              {/* Mostra il numero assoluto positivo dei downvote in tinta con l'interfaccia */}
+              <span className="font-bold text-sm text-gray-400 select-none">
+                {dislikes}
+              </span>
+            </div>
           </div>
 
           <button
@@ -159,6 +170,7 @@ const MemeCard = ({ meme }) => {
         </div>
       </div>
 
+      {/* MODALE DI CONTROLLO DEI LIKE */}
       {isLikesModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
           <div className="bg-zinc-900 border border-purple-500/30 rounded-2xl w-full max-w-sm shadow-[0_0_30px_rgba(168,85,247,0.2)] overflow-hidden flex flex-col max-h-[70vh]">

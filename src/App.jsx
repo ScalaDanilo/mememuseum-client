@@ -6,6 +6,7 @@ import {
   Link,
   useNavigate,
   useLocation,
+  Navigate,
 } from "react-router-dom";
 import { User, Filter, Search } from "lucide-react";
 
@@ -187,7 +188,7 @@ const MainLayout = () => {
                           onClick={() => applyFilter("sort", "most_downvoted")}
                           className="px-4 py-3 text-left text-sm hover:bg-purple-900/30 hover:text-purple-300 border-b border-purple-500/20 transition-colors"
                         >
-                          Meno UpVote
+                          Più DownVote
                         </button>
                         <button
                           onClick={() => setShowTagInput(true)}
@@ -268,14 +269,26 @@ const MainLayout = () => {
   );
 };
 
+const PublicRoute = () => {
+  const token = localStorage.getItem("token");
+  const isAuthenticated = token && token !== "undefined" && token !== "null" && token !== "";
+
+  return isAuthenticated ? <Navigate to="/" replace /> : <Outlet />;
+};
+
 const router = createBrowserRouter([
   {
     path: "/",
     element: <MainLayout />,
     children: [
       { path: "/", element: <Home /> },
-      { path: "/login", element: <Login /> },
-      { path: "/register", element: <Register /> },
+      {
+        element: <PublicRoute />,
+        children: [
+          { path: "/login", element: <Login /> },
+          { path: "/register", element: <Register /> },
+        ],
+      },
       { path: "/upload", element: <Upload /> },
       { path: "/meme/:id", element: <MemeDetail /> },
       { path: "/profile", element: <Profile /> },
