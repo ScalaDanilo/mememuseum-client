@@ -15,6 +15,7 @@ const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editUsername, setEditUsername] = useState('');
   const [editPassword, setEditPassword] = useState('');
+  const [usernameError, setUsernameError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null); 
   const [previewImage, setPreviewImage] = useState(null);   
@@ -36,6 +37,17 @@ const Profile = () => {
     fetchProfile();
   }, [navigate]);
 
+  const handleUsernameChange = (e) => {
+    const value = e.target.value;
+    setEditUsername(value);
+
+    if (value.trim().length > 16) {
+      setUsernameError("Lo username non può superare i 16 caratteri!");
+    } else {
+      setUsernameError("");
+    }
+  };
+
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -46,6 +58,8 @@ const Profile = () => {
   };
 
   const handleSave = async () => {
+    if (editUsername.trim().length > 16) return;
+
     const formData = new FormData();
     if (editUsername !== user.username) formData.append('username', editUsername);
     if (editPassword) formData.append('password', editPassword);
@@ -59,6 +73,7 @@ const Profile = () => {
       setUser({ ...user, ...response.data.user });
       setIsEditing(false);
       setEditPassword(''); 
+      setUsernameError('');
       alert("Profilo aggiornato con successo!");
 
       window.dispatchEvent(new Event('profileUpdated')); 
@@ -154,9 +169,20 @@ const Profile = () => {
               <div>
                 <label className="block text-sm font-semibold text-gray-300 mb-1">Username</label>
                 <input 
-                  type="text" value={editUsername} onChange={(e) => setEditUsername(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-zinc-950 border border-purple-500/30 rounded-lg text-white focus:outline-none focus:border-purple-500"
+                  type="text" 
+                  value={editUsername} 
+                  onChange={handleUsernameChange}
+                  className={`w-full px-4 py-2.5 bg-zinc-950 text-white placeholder-gray-600 border rounded-lg focus:outline-none transition-all ${
+                    usernameError 
+                      ? "border-red-500 focus:border-red-500 focus:shadow-[0_0_15px_rgba(239,68,68,0.4)]" 
+                      : "border-purple-500/30 focus:border-purple-500 focus:shadow-[0_0_15px_rgba(168,85,247,0.4)]"
+                  }`}
                 />
+                {usernameError && (
+                  <p className="text-red-400 text-xs font-bold mt-2 pl-1 animate-fade-in">
+                    {usernameError}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -174,10 +200,27 @@ const Profile = () => {
               </div>
 
               <div className="flex gap-3 pt-4">
-                <button onClick={handleSave} className="flex-1 bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 rounded-lg transition-all shadow-[0_0_15px_rgba(147,51,234,0.4)]">
+                <button 
+                  onClick={handleSave} 
+                  disabled={!!usernameError}
+                  className={`flex-1 text-white font-bold py-3 rounded-lg transition-all ${
+                    usernameError 
+                      ? "bg-purple-600 opacity-50 cursor-not-allowed shadow-none" 
+                      : "bg-purple-600 hover:bg-purple-500 shadow-[0_0_15px_rgba(147,51,234,0.4)]"
+                  }`}
+                >
                   Salva Modifiche
                 </button>
-                <button onClick={() => { setIsEditing(false); setPreviewImage(null); setSelectedImage(null); setEditUsername(user.username); }} className="px-4 bg-zinc-800 hover:bg-zinc-700 text-gray-300 rounded-lg transition-all">
+                <button 
+                  onClick={() => { 
+                    setIsEditing(false); 
+                    setPreviewImage(null); 
+                    setSelectedImage(null); 
+                    setEditUsername(user.username); 
+                    setUsernameError('');
+                  }} 
+                  className="px-4 bg-zinc-800 hover:bg-zinc-700 text-gray-300 rounded-lg transition-all"
+                >
                   <X size={24} />
                 </button>
               </div>
@@ -196,7 +239,7 @@ const Profile = () => {
           <div className="text-center py-12 bg-zinc-900/50 rounded-2xl border border-dashed border-zinc-700">
             <p className="text-gray-400 text-lg">Non hai ancora caricato nessun meme.</p>
             <button onClick={() => navigate('/upload')} className="mt-4 px-6 py-2 bg-purple-600/20 text-purple-400 border border-purple-500 rounded-full hover:bg-purple-600 hover:text-white transition-colors">
-              Carica il tuo primo meme!
+              Carica il tuo primer meme!
             </button>
           </div>
         ) : (

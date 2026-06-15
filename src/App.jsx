@@ -113,7 +113,8 @@ const MainLayout = () => {
       currentParams.set("sortBy", value);
       currentParams.delete("tag");
     } else if (type === "tag") {
-      currentParams.set("tag", value);
+      const cleanedTag = value.trim().replace(/^#+/, '');
+      currentParams.set("tag", cleanedTag);
     }
     navigate(`/?${currentParams.toString()}`);
     setIsFilterOpen(false);

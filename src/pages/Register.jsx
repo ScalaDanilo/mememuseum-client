@@ -14,15 +14,26 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState("");
+  const [usernameError, setUsernameError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     setError("");
+
+    if (e.target.name === "username") {
+      if (e.target.value.trim().length > 16) {
+        setUsernameError("Lo username non può superare i 16 caratteri!");
+      } else {
+        setUsernameError("");
+      }
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (formData.username.trim().length > 16) return;
 
     if (formData.password !== formData.confirmPassword) {
       return setError("Le due password non combaciano.");
@@ -80,9 +91,18 @@ const Register = () => {
               value={formData.username}
               onChange={handleChange}
               placeholder="Il tuo nome meme"
-              className="w-full px-4 py-3 bg-zinc-950 text-white placeholder-gray-600 border border-purple-500/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 focus:shadow-[0_0_15px_rgba(168,85,247,0.4)] transition-all"
+              className={`w-full px-4 py-3 bg-zinc-950 text-white placeholder-gray-600 border rounded-lg focus:outline-none transition-all ${
+                usernameError
+                  ? "border-red-500 focus:ring-2 focus:ring-red-500 focus:border-red-500 focus:shadow-[0_0_15px_rgba(239,68,68,0.4)]"
+                  : "border-purple-500/30 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 focus:shadow-[0_0_15px_rgba(168,85,247,0.4)]"
+              }`}
               required
             />
+            {usernameError && (
+              <p className="text-red-400 text-xs font-bold mt-2 pl-1 animate-fade-in">
+                {usernameError}
+              </p>
+            )}
           </div>
 
           <div>
@@ -133,7 +153,6 @@ const Register = () => {
             </div>
           </div>
 
-          {/* Riquadro informativo con le linee guida della password */}
           <div className="p-4 bg-zinc-950/60 border border-purple-500/20 rounded-xl text-xs text-gray-400 space-y-1.5 select-none">
             <p className="font-bold text-purple-400 text-sm mb-1">
               Requisiti per una password sicura:
@@ -173,8 +192,8 @@ const Register = () => {
 
           <button
             type="submit"
-            disabled={isLoading}
-            className={`w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 rounded-lg transition-all mt-4 ${isLoading ? "opacity-50 cursor-not-allowed" : "shadow-[0_0_15px_rgba(147,51,234,0.5)] hover:shadow-[0_0_25px_rgba(147,51,234,0.7)]"}`}
+            disabled={isLoading || !!usernameError}
+            className={`w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 rounded-lg transition-all mt-4 ${isLoading || usernameError ? "opacity-50 cursor-not-allowed shadow-none" : "shadow-[0_0_15px_rgba(147,51,234,0.5)] hover:shadow-[0_0_25px_rgba(147,51,234,0.7)]"}`}
           >
             {isLoading ? "Registrazione in corso..." : "Registrati"}
           </button>

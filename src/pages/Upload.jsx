@@ -69,9 +69,8 @@ const Upload = () => {
     setIsDropdownOpen(false);
   };
 
-  // Crea il tag sul DB ed effettua l'aggiunta automatica al meme
   const handleCreateAndAddTag = async (tagName) => {
-    const cleanedName = tagName.trim();
+    let cleanedName = tagName.trim().replace(/^#+/, '');
     if (!cleanedName) return;
 
     try {
@@ -119,7 +118,7 @@ const Upload = () => {
       console.error("Errore caricamento:", error);
       alert(
         error.response?.data?.error ||
-          "Errore durante il caricamento del meme.",
+        "Errore durante il caricamento del meme.",
       );
     } finally {
       setIsLoading(false);
@@ -153,10 +152,9 @@ const Upload = () => {
             <label
               className={`
                 flex flex-col items-center justify-center rounded-2xl border-2 border-dashed transition-all cursor-pointer overflow-hidden relative
-                ${
-                  imagePreview
-                    ? "w-fit max-w-full max-h-[450px] border-purple-500/50 shadow-[0_0_20px_rgba(168,85,247,0.2)]"
-                    : "w-full aspect-square border-zinc-700 hover:border-purple-500 hover:bg-purple-900/10"
+                ${imagePreview
+                  ? "w-fit max-w-full max-h-[450px] border-purple-500/50 shadow-[0_0_20px_rgba(168,85,247,0.2)]"
+                  : "w-full aspect-square border-zinc-700 hover:border-purple-500 hover:bg-purple-900/10"
                 }
               `}
             >
