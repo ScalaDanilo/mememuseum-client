@@ -6,6 +6,7 @@ import {
   X,
   Image as ImageIcon,
   Plus,
+  Info, // 👈 Nuova icona importata per il riquadro informativo
 } from "lucide-react";
 import api from "../api/axios";
 
@@ -64,7 +65,7 @@ const Upload = () => {
 
   const handleAddTag = (tagObject) => {
     setSelectedTags([...selectedTags, tagObject]);
-    setSearchTag("");
+    searchTag("");
     setIsDropdownOpen(false);
   };
 
@@ -148,7 +149,7 @@ const Upload = () => {
       <form onSubmit={handleSubmit} className="flex flex-col gap-12">
         <div className="flex flex-col md:flex-row gap-8 items-start">
           {/* Colonna di sinistra: Immagine e Cornice Adattiva */}
-          <div className="w-full md:w-1/2 flex justify-center">
+          <div className="w-full md:w-1/2 flex flex-col items-center justify-center">
             <label
               className={`
                 flex flex-col items-center justify-center rounded-2xl border-2 border-dashed transition-all cursor-pointer overflow-hidden relative
@@ -166,7 +167,6 @@ const Upload = () => {
                     alt="Preview"
                     className="max-w-full max-h-[450px] w-auto h-auto object-contain block rounded-2xl"
                   />
-                  {/* Modificato l'overlay in flex-col con p-3 e text-center per garantire la centratura perfetta */}
                   <div className="absolute inset-0 bg-black/50 opacity-0 hover:opacity-100 flex flex-col items-center justify-center p-3 text-center transition-opacity select-none">
                     <ImageIcon
                       size={24}
@@ -194,6 +194,14 @@ const Upload = () => {
                 required={!imagePreview}
               />
             </label>
+
+            {/* 🌟 NUOVO CODICE: Riquadro informativo per i formati accettati */}
+            <div className={`mt-4 flex items-center gap-2.5 bg-zinc-900/50 border border-purple-500/10 rounded-xl p-3 text-xs text-gray-400 shadow-[0_4px_12px_rgba(0,0,0,0.15)] ${imagePreview ? 'w-fit max-w-full' : 'w-full'}`}>
+              <Info size={16} className="text-purple-400 shrink-0" />
+              <p className="leading-relaxed">
+                Formati supportati: <span className="text-purple-300 font-bold tracking-wide">JPEG, PNG, GIF, WEBP</span>.
+              </p>
+            </div>
           </div>
 
           {/* Colonna di destra: Campi Input del Form */}

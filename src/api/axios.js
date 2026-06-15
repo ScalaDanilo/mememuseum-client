@@ -1,6 +1,7 @@
-const API_URL = `http://${window.location.hostname}:3000/api`;
-export const BACKEND_URL = `http://${window.location.hostname}:3000`;
 import axios from 'axios';
+
+export const BACKEND_URL = `https://mememuseum-ds.duckdns.org`;
+const API_URL = `${BACKEND_URL}/api`;
 
 const api = axios.create({
     baseURL: API_URL,
